@@ -17,8 +17,8 @@ objects:
         git:
           uri: "${SOURCE_REPOSITORY_URL}"
           ref: "${SOURCE_REPOSITORY_REF}"
-        sourceSecret:
-          name: ${SOURCE_SECRET_NAME}
+        # sourceSecret:
+        #   name: ${SOURCE_SECRET_NAME}
       output:
         to:
           kind: ImageStreamTag
@@ -32,6 +32,54 @@ objects:
     apiVersion: v1
     metadata:
       name: jenkins-docker-slave
+  - kind: DeploymentConfig
+    apiVersion: v1
+    metadata:
+      name: ${NAME}
+      annotations:
+        template.alpha.openshift.io/wait-for-ready: 'true'
+    spec:
+      replicas: 1
+      strategy:
+        type: Recreate
+      selector:
+        name: ${NAME}
+      template:
+        metadata:
+          labels:
+            name: ${NAME}
+          name: ${NAME}
+      spec:
+        containers:
+          - name: ${NAME}
+            ports:
+              - containerPort: 8080
+            livenessProbe:
+              timeoutSeconds: 3
+              initialDelaySeconds: 30
+              httpGet:
+                path: "/"
+                port: 8080
+      triggers:
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - jenkins-docker-slave
+            from:
+              kind: "ImageStreamTag"
+              name: "jenkins-docker-slave:latest"
+  - kind: Service
+    apiVersion: v1
+    metadata:
+      name: ${NAME}
+    spec:
+      ports:
+        - name: app
+          port: 8080
+          targetPort: 8080
+      selector:
+        name: ${NAME}
 
 parameters:
   - name: NAME
@@ -43,7 +91,7 @@ parameters:
     displayName: Git Repository URL
     description: The URL of the repository with your application source code.
     required: true
-    value: https://github.tk-online.net/web/openshift.git
+    value: git@github.com:Madomur/openshift-jenkins-docker-slave.git
   - name: SOURCE_REPOSITORY_REF
     displayName: Git Reference
     description: Set this to a branch name, tag or other ref of your repository if you
