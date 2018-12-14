@@ -1,6 +1,5 @@
 ---
-
-kind: template
+kind: Template
 apiVersion: v1
 labels:
   app: jenkins-docker-slave
