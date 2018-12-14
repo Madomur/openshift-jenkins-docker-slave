@@ -5,7 +5,7 @@ labels:
   app: jenkins-docker-slave
   template: jenkins-docker-slave
 metadata:
-  name: jenkinsdockerslave
+  name: jenkins-docker-slave
 
 objects:
   - kind: BuildConfig
@@ -49,12 +49,12 @@ objects:
           labels:
             name: ${NAME}
           name: ${NAME}
-      spec:
-        containers:
-          - name: ${NAME}
-            ports:
-              - containerPort: 8080
-            livenessProbe:
+        spec:
+          containers:
+            - name: ${NAME}
+              ports:
+                - containerPort: 8080
+              livenessProbe:
               timeoutSeconds: 3
               initialDelaySeconds: 30
               httpGet:
