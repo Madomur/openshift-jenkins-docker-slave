@@ -5,6 +5,7 @@ labels:
   app: jenkins-docker-slave
   template: jenkins-docker-slave
 metadata:
+  name: jenkins-docker-slave
 
 objects:
   - kind: BuildConfig
